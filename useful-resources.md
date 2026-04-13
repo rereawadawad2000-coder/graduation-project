@@ -19,3 +19,6 @@
 - **Goal:** Train a skin-lesion detection/classification model
 - **Supporting Libraries:**
  	- Python ML/DL libraries for preprocessing, training, and evaluation
+
+## 3) lottie files url
+- **Lottie Animations:** <https://lottiefiles.com/>
