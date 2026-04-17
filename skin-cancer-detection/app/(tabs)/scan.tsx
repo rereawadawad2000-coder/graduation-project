@@ -1,14 +1,31 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { theme } from '../../constants/theme';
 
+type PredictResponse = {
+  predicted_class: string;
+  confidence: number;
+  probabilities: Record<string, number>;
+  disclaimer: string;
+};
+
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_BASE_URL ??
+  Platform.select({
+    android: 'http://10.0.2.2:8000',
+    ios: 'http://127.0.0.1:8000',
+    default: 'http://127.0.0.1:8000',
+  });
+
 export default function ScanScreen() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [resultText, setResultText] = useState<string | null>(null);
+  const [disclaimerText, setDisclaimerText] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -31,14 +48,52 @@ export default function ScanScreen() {
     setResultText(null);
   };
 
-  const runPrediction = () => {
+  const runPrediction = async () => {
     if (!imageUri) {
       Alert.alert('No image selected', 'Pick an image before running AI result.');
       return;
     }
 
-    const outcome = Math.random() > 0.5 ? 'Low-risk pattern detected' : 'Please review with dermatologist';
-    setResultText(outcome);
+    setIsLoading(true);
+    setResultText(null);
+    setDisclaimerText(null);
+
+    try {
+      const fileName = imageUri.split('/').pop() ?? 'scan.jpg';
+      const ext = fileName.split('.').pop()?.toLowerCase();
+      const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
+
+      const formData = new FormData();
+      formData.append(
+        'file',
+        {
+          uri: imageUri,
+          name: fileName,
+          type: mimeType,
+        } as any
+      );
+
+      const response = await fetch(`${API_BASE_URL}/predict`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const payload = (await response.json()) as Partial<PredictResponse> & { detail?: string };
+      if (!response.ok) {
+        throw new Error(payload.detail ?? 'Prediction request failed.');
+      }
+
+      const predictedClass = payload.predicted_class ?? 'unknown';
+      const confidence = (payload.confidence ?? 0) * 100;
+
+      setResultText(`${predictedClass.toUpperCase()} (${confidence.toFixed(1)}%)`);
+      setDisclaimerText(payload.disclaimer ?? 'For educational use only. Not a medical diagnosis.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not connect to prediction API.';
+      Alert.alert('Prediction failed', `${message}\n\nTip: Ensure FastAPI is running on ${API_BASE_URL}.`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -73,14 +128,23 @@ export default function ScanScreen() {
 
         <Text style={styles.helperText}>If you're happy with the picture tap below for AI Result</Text>
 
-        <Pressable style={styles.resultButton} onPress={runPrediction}>
-          <Feather name="navigation" size={28} color="#FFFFFF" />
+        <Pressable
+          style={[styles.resultButton, isLoading ? styles.resultButtonDisabled : null]}
+          onPress={runPrediction}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Feather name="navigation" size={28} color="#FFFFFF" />
+          )}
         </Pressable>
 
         {resultText ? (
           <View style={styles.resultCard}>
             <Text style={styles.resultLabel}>Prediction</Text>
             <Text style={styles.resultText}>{resultText}</Text>
+            {disclaimerText ? <Text style={styles.disclaimerText}>{disclaimerText}</Text> : null}
           </View>
         ) : null}
       </View>
@@ -196,6 +260,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 2,
   },
+  resultButtonDisabled: {
+    opacity: 0.7,
+  },
   resultCard: {
     width: '100%',
     marginTop: theme.spacing.md,
@@ -215,5 +282,12 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontFamily: theme.typography.bodySemi,
     fontSize: 16,
+  },
+  disclaimerText: {
+    marginTop: 4,
+    color: theme.colors.textMuted,
+    fontFamily: theme.typography.body,
+    fontSize: 12,
+    lineHeight: 18,
   },
 });

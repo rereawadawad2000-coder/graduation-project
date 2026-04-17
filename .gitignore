@@ -1,0 +1,24 @@
+# Python virtual environments
+.venv/
+venv/
+**/.venv/
+**/venv/
+
+# Python bytecode and caches
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local environment files
+.env
+.env.*
+
+# Notebook and tool caches
+.ipynb_checkpoints/
+
+# Build/distribution artifacts
+build/
+dist/
+*.egg-info/
