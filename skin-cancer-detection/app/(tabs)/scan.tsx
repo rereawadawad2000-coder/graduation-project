@@ -11,6 +11,9 @@ type PredictResponse = {
   confidence: number;
   probabilities: Record<string, number>;
   disclaimer: string;
+  reliable?: boolean;
+  top2_margin?: number;
+  reliability_reason?: string;
 };
 
 const API_BASE_URL =
@@ -85,6 +88,17 @@ export default function ScanScreen() {
 
       const predictedClass = payload.predicted_class ?? 'unknown';
       const confidence = (payload.confidence ?? 0) * 100;
+      const thresholdReliable = (payload.confidence ?? 0) >= 0.96 && (payload.top2_margin ?? 1) >= 0.18;
+      const isReliable = payload.reliable ?? thresholdReliable;
+
+      if (!isReliable) {
+        setResultText(`INCONCLUSIVE (${confidence.toFixed(1)}%)`);
+        setDisclaimerText(
+          payload.reliability_reason ??
+            'Inconclusive result. Please use a clear, close-up skin lesion image and try again.'
+        );
+        return;
+      }
 
       setResultText(`${predictedClass.toUpperCase()} (${confidence.toFixed(1)}%)`);
       setDisclaimerText(payload.disclaimer ?? 'For educational use only. Not a medical diagnosis.');
