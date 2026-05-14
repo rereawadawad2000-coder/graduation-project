@@ -22,8 +22,8 @@ MIN_SKIN_RATIO = float(os.getenv("MIN_SKIN_RATIO", "0.20"))
 MAX_TTA_STD = float(os.getenv("MAX_TTA_STD", "0.10"))
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-MODEL_PATH = Path(os.getenv("MODEL_PATH", str(PROJECT_ROOT / "scanModel" / "skin_lesion_model.h5")))
-CLASSES_PATH = Path(os.getenv("CLASSES_PATH", str(PROJECT_ROOT / "scanModel" / "classes.json")))
+MODEL_PATH = Path(os.getenv("MODEL_PATH", str(PROJECT_ROOT / "Model" / "skin_lesion_model.h5")))
+CLASSES_PATH = Path(os.getenv("CLASSES_PATH", str(PROJECT_ROOT / "Model" / "classes.json")))
 
 app = FastAPI(title="Skin Lesion Demo API", version="1.0.0")
 

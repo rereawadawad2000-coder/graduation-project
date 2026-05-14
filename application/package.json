@@ -1,5 +1,5 @@
 {
-  "name": "skin-cancer-detection",
+  "name": "application",
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {

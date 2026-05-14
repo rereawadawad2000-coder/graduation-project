@@ -15,7 +15,7 @@ Model scope note:
 
 ## Expected model artifacts
 
-Place these files in `../scanModel/` relative to this folder:
+Place these files in `../Model/` relative to this folder:
 
 - `skin_lesion_model.h5`
 - `classes.json` (optional)
@@ -60,7 +60,7 @@ ipconfig
 
 Use the `IPv4 Address` under your active Wi-Fi adapter.
 
-For Expo mobile app testing, set this in `skin-cancer-detection/.env.local`:
+For Expo mobile app testing, set this in `application/.env.local`:
 
 ```bash
 EXPO_PUBLIC_API_BASE_URL=http://<YOUR_PC_LAN_IP>:8000

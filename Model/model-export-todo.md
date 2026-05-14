@@ -24,7 +24,7 @@ Notebook placement tip:
 import json
 from pathlib import Path
 
-OUTPUT_DIR = Path(".")  # current notebook folder (scanModel)
+OUTPUT_DIR = Path(".")  # current notebook folder (Model)
 MODEL_NAME = "skin_lesion_model.h5"
 CLASSES_NAME = "classes.json"
 
@@ -67,12 +67,12 @@ print("Confidence:", float(probs[idx]))
 
 Your API currently expects:
 
-- `scanModel/skin_lesion_model.h5`
-- `scanModel/classes.json`
+- `Model/skin_lesion_model.h5`
+- `Model/classes.json`
 
 Checklist:
 
-- [ ] Verify both files exist in this exact folder: `scanModel/`
+- [ ] Verify both files exist in this exact folder: `Model/`
 - [ ] Verify `classes.json` order matches `le.classes_` from training run
 
 ## 4) Start and verify FastAPI with exported model
