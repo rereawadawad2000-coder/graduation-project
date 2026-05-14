@@ -9,6 +9,14 @@ cd api
 ```
 
 
+First time only:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
 Every run: on a terminal 
 
 ```bash
@@ -24,8 +32,8 @@ ipconfig
 ## check the ipv4 from the results you get : and copy it 
 then paste the below but replace the delete with the ipv4:
 
-EXPO_PUBLIC_API_BASE_URL=http://delete me:8000
-then copy this line above and creat the .env.local file inside the graduation project in the application folder
+EXPO_PUBLIC_API_BASE_URL=http://192.168.1.197:8000
+then copy this line above and create the .env.local file inside the graduation project in the application folder
 
 paste the line you copied and place it inside the folder you created
 
